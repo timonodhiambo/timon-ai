@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1020">
+<title>Timon AI | Developed by Timon</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#111a2e;--line:#26344d;--blue:#5085ff;--text:#edf3ff;--muted:#98a8c3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
+button,input,textarea{font:inherit}
+.app{display:flex;min-height:100vh}
+.sidebar{width:250px;padding:24px 16px;background:#080d19;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:20px}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.7px}
+.brand span{color:#71a1ff}
+.sub{color:var(--muted);font-size:12px;margin-top:7px}
+.new,.send,.quick{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel);color:var(--text);cursor:pointer}
+.new{background:#182b4c;text-align:left}
+.side-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.side-note{font-size:13px;line-height:1.7;color:var(--muted)}
+main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh}
+header{height:65px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.status{font-size:12px;color:#a9c4ff;background:#162746;padding:8px 11px;border-radius:20px}
+.content{width:min(850px,100%);margin:auto;padding:36px 22px;flex:1}
+.hero{text-align:center;margin:36px 0 30px}
+.logo{width:62px;height:62px;border-radius:19px;background:linear-gradient(135deg,#548cff,#7855e8);display:grid;place-items:center;font-size:27px;font-weight:bold;margin:0 auto 20px;box-shadow:0 8px 40px #345caa55}
+h1{font-size:clamp(28px,5vw,42px);margin:0 0 12px;letter-spacing:-1.5px}
+.hero p{color:var(--muted);line-height:1.7;margin:0}
+.quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:28px 0}
+.quick{text-align:left;line-height:1.5;min-height:85px}
+.quick strong{display:block;margin-bottom:6px}
+.quick small{color:var(--muted)}
+.chat{display:flex;flex-direction:column;gap:16px;margin:25px 0}
+.message{padding:15px 17px;border:1px solid var(--line);border-radius:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+.message.user{background:#192949;align-self:flex-end;max-width:90%}
+.message.assistant{background:var(--panel);align-self:stretch}
+.composer{position:sticky;bottom:0;padding:15px 22px 18px;background:linear-gradient(transparent,var(--bg) 20%)}
+.compose-inner{max-width:850px;margin:auto;border:1px solid #344563;background:var(--panel);border-radius:15px;padding:10px;display:flex;gap:10px;align-items:flex-end}
+textarea{flex:1;resize:vertical;min-height:45px;max-height:150px;background:transparent;border:0;outline:0;color:var(--text);padding:10px;line-height:1.5}
+.send{background:var(--blue);border:0;font-weight:bold;padding:12px 17px}
+.hint{text-align:center;color:var(--muted);font-size:11px;margin-top:10px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:15px}
+button:hover{filter:brightness(1.15)}
+@media(max-width:650px){.sidebar{display:none}header{padding:0 15px}.content{padding:20px 14px}.hero{margin:35px 0 24px}.quick-grid{gap:8px}.quick{padding:10px;font-size:13px}.composer{padding:10px}.status{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div>
+    <div class="brand">Timon <span>AI</span></div>
+    <div class="sub">YOUR PROJECT DEVELOPMENT PARTNER</div>
+  </div>
+  <button class="new" id="newChat">＋ New conversation</button>
+  <div class="side-label">Workspace</div>
+  <div class="side-note">Project planning<br>Code & debugging<br>Database assistance<br>Deployment guidance</div>
+  <div style="margin-top:auto">
+    <div class="side-label">Developer</div>
+    <p style="font-size:14px">Timon Odhiambo</p>
+    <div class="sub">Developed by Timon © 2026</div>
+  </div>
+</aside>
+<main>
+<header>
+  <strong>Timon AI <span style="color:var(--muted);font-weight:normal">/ Workspace</span></strong>
+  <span class="status">● Initial version</span>
+</header>
+<section class="content">
+  <div class="hero" id="hero">
+    <div class="logo">T</div>
+    <h1>Let's build something great.</h1>
+    <p>Your workspace for projects, coding, databases and deployment.<br>What are we working on today?</p>
+  </div>
+  <div class="quick-grid" id="quickGrid">
+    <button class="quick" data-prompt="Help me plan and manage a software project."><strong>▦ Manage a project</strong><small>Plan tasks and track progress</small></button>
+    <button class="quick" data-prompt="Help me debug a coding error. Ask me to share the error and relevant code."><strong>⌘ Debug my code</strong><small>Understand and fix errors</small></button>
+    <button class="quick" data-prompt="Help me design a database safely without losing existing records."><strong>▤ Database help</strong><small>SQL, tables and data safety</small></button>
+    <button class="quick" data-prompt="Help me deploy my application for free. Ask which platform I am using."><strong>⇧ Deploy an app</strong><small>Web hosting and Android plans</small></button>
+  </div>
+  <div class="chat" id="chat" aria-live="polite"></div>
+</section>
+<div class="composer">
+  <form class="compose-inner" id="chatForm">
+    <textarea id="prompt" placeholder="Ask Timon AI about your project..." aria-label="Your message" required></textarea>
+    <button class="send" type="submit">Send ↑</button>
+  </form>
+  <div class="hint">Never share passwords or private API keys in chat.</div>
+</div>
+<footer>Developed by Timon · Built for ideas that become real projects</footer>
+</main>
+</div>
+<script>
+const chat=document.getElementById('chat');
+const input=document.getElementById('prompt');
+const hero=document.getElementById('hero');
+const quickGrid=document.getElementById('quickGrid');
+
+function addMessage(text,who){
+  const el=document.createElement('div');
+  el.className='message '+who;
+  el.textContent=text;
+  chat.appendChild(el);
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function ask(text){
+  const value=text.trim();
+  if(!value)return;
+  hero.style.display='none';
+  quickGrid.style.display='none';
+  addMessage(value,'user');
+  addMessage("Welcome to Timon AI!\n\nYour chat interface is working. The live AI engine is not connected yet, so I cannot generate an intelligent answer at this stage.\n\nNext, we will connect an AI model, then add project files, saved conversations and project management tools. Never paste API keys or passwords into this public website.",'assistant');
+  input.value='';
+}
+document.getElementById('chatForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  ask(input.value);
+});
+document.querySelectorAll('[data-prompt]').forEach(button=>{
+  button.addEventListener('click',()=>ask(button.dataset.prompt));
+});
+document.getElementById('newChat').addEventListener('click',()=>{
+  chat.replaceChildren();
+  hero.style.display='';
+  quickGrid.style.display='';
+  input.value='';
+});
+</script>
+</body>
+</html>
