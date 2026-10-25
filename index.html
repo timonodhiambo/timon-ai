@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10111b">
+  <meta name="description" content="Timon AI — your assistant for coding, databases, projects and app development.">
+  <title>Timon AI — Your AI Workspace</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10111b;
+      --panel: #191b29;
+      --panel2: #222438;
+      --text: #f5f5ff;
+      --muted: #a5a8c1;
+      --accent: #8b7cff;
+      --border: #30334a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+    }
+
+    button, textarea { font: inherit; }
+
+    .sidebar {
+      width: 250px;
+      padding: 24px 16px;
+      background: #141521;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .brand {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .new-chat, .suggestion, .send {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      color: var(--text);
+      background: var(--panel);
+    }
+
+    .new-chat:hover, .suggestion:hover {
+      border-color: var(--accent);
+    }
+
+    .sidebar-note {
+      margin-top: auto;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 20px 28px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    #chat {
+      flex: 1;
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .welcome {
+      text-align: center;
+      margin: auto 0 10px;
+    }
+
+    .logo {
+      width: 66px;
+      height: 66px;
+      margin: 0 auto 18px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #8b7cff, #42c9dc);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    h1 { font-size: clamp(27px, 5vw, 38px); margin: 0 0 10px; }
+    .welcome p { color: var(--muted); line-height: 1.6; }
+
+    .suggestions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 560px;
+      margin: 24px auto 0;
+    }
+
+    .suggestion { text-align: left; line-height: 1.5; }
+    .suggestion strong { display: block; margin-bottom: 4px; }
+    .suggestion small { color: var(--muted); }
+
+    .message {
+      max-width: 88%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #343052;
+    }
+
+    .assistant {
+      align-self: flex-start;
+      background: var(--panel);
+      border: 1px solid var(--border);
+    }
+
+    .error { border-color: #a94b61; }
+
+    .composer-wrap {
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 0 22px 12px;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 10px;
+    }
+
+    textarea {
+      flex: 1;
+      min-width: 0;
+      resize: vertical;
+      min-height: 44px;
+      max-height: 180px;
+      padding: 12px;
+      color: var(--text);
+      background: transparent;
+      border: 0;
+      outline: none;
+    }
+
+    .send {
+      background: var(--accent);
+      border: 0;
+      font-weight: 700;
+      min-width: 76px;
+    }
+
+    .send:disabled { opacity: .55; cursor: wait; }
+
+    .notice {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+      padding: 8px 0 0;
+    }
+
+    footer {
+      color: var(--muted);
+      text-align: center;
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 650px) {
+      .sidebar { display: none; }
+      header { padding: 17px 18px; }
+      #chat { padding: 22px 15px; }
+      .composer-wrap { padding: 0 12px 10px; }
+      .suggestions { grid-template-columns: 1fr; }
+      .message { max-width: 95%; }
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="brand">Timon <span>AI</span></div>
+    <button class="new-chat" id="newChat">＋ New conversation</button>
+    <div class="sidebar-note">
+      Your AI workspace for coding, databases, project planning and app deployment.
+      <br><br>
+      Built by Timon Odhiambo.
+    </div>
+  </aside>
+
+  <main>
+    <header>Timon AI <span style="color:#8b7cff">/</span> AI Workspace</header>
+
+    <section id="chat" aria-live="polite">
+      <div class="welcome" id="welcome">
+        <div class="logo">T</div>
+        <h1>What are we building today?</h1>
+        <p>Ask questions, solve problems and move your projects forward.</p>
+
+        <div class="suggestions">
+          <button class="suggestion" data-prompt="Help me plan and manage a software project.">
+            <strong>Manage a project</strong>
+            <small>Plan tasks and next steps</small>
+          </button>
+          <button class="suggestion" data-prompt="Help me debug my code. Explain how to find and fix errors.">
+            <strong>Debug my code</strong>
+            <small>Find and fix programming errors</small>
+          </button>
+          <button class="suggestion" data-prompt="Explain how to design and set up a database for my application.">
+            <strong>Database help</strong>
+            <small>Understand tables and queries</small>
+          </button>
+          <button class="suggestion" data-prompt="Guide me through deploying my web application step by step.">
+            <strong>Deploy an app</strong>
+            <small>Get your app online</small>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="composer-wrap">
+      <form id="chatForm">
+        <textarea id="messageInput" placeholder="Message Timon AI..." aria-label="Your message" rows="1" required></textarea>
+        <button class="send" id="sendButton" type="submit">Send ↑</button>
+      </form>
+      <div class="notice" id="status">AI connection will be checked when you send a message.</div>
+    </div>
+
+    <footer>© 2026 Timon AI · Developed by Timon Odhiambo</footer>
+  </main>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const welcome = document.getElementById("welcome");
+    const form = document.getElementById("chatForm");
+    const input = document.getElementById("messageInput");
+    const sendButton = document.getElementById("sendButton");
+    const statusText = document.getElementById("status");
+
+    let busy = false;
+
+    function addMessage(text, role, isError = false) {
+      const message = document.createElement("div");
+      message.className = "message " + role + (isError ? " error" : "");
+      message.textContent = text;
+      chat.appendChild(message);
+      message.scrollIntoView({ behavior: "smooth", block: "end" });
+      return message;
+    }
+
+    async function ask(text) {
+      const message = text.trim();
+      if (!message || busy) return;
+
+      busy = true;
+      sendButton.disabled = true;
+      input.disabled = true;
+      sendButton.textContent = "Wait…";
+      welcome.style.display = "none";
+
+      addMessage(message, "user");
+      input.value = "";
+
+      const loading = addMessage("Thinking…", "assistant");
+      statusText.textContent = "Connecting to Timon AI…";
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+        loading.remove();
+
+        if (!response.ok) {
+          throw new Error(data.error || "The AI request failed.");
+        }
+
+        if (!data.reply) {
+          throw new Error("The server returned no reply. Please try again.");
+        }
+
+        addMessage(data.reply, "assistant");
+        statusText.textContent = "Response received.";
+      } catch (error) {
+        loading.remove();
+        addMessage(
+          "I couldn't get an AI response. " + error.message +
+          "\n\nCheck that the backend is deployed and the Cloudflare AI binding is configured.",
+          "assistant",
+          true
+        );
+        statusText.textContent = "Connection needs attention.";
+      } finally {
+        busy = false;
+        sendButton.disabled = false;
+        input.disabled = false;
+        sendButton.textContent = "Send ↑";
+        input.focus();
+      }
+    }
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      ask(input.value);
+    });
+
+    document.querySelectorAll("[data-prompt]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        ask(button.dataset.prompt);
+      });
+    });
+
+    document.getElementById("newChat").addEventListener("click", function() {
+      chat.innerHTML = "";
+      chat.appendChild(welcome);
+      welcome.style.display = "";
+      input.value = "";
+      statusText.textContent = "Ready for a new conversation.";
+      input.focus();
+    });
+
+    input.addEventListener("keydown", function(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        form.requestSubmit();
+      }
+    });
+  </script>
+</body>
+  </html>
+  
